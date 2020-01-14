@@ -76,7 +76,7 @@ class KNearestNeighbor(object):
                 # not use a loop over dimension, nor use np.linalg.norm().          #
                 #####################################################################
                 # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-
+                dists[i,j] = np.sqrt(np.sum(np.square(self.X_train[j,:] - X[i,:])))
                 pass
 
                 # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
@@ -163,7 +163,11 @@ class KNearestNeighbor(object):
             # Hint: Look up the function numpy.argsort.                             #
             #########################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-
+            print(np.argsort(dists[i,:]))
+            idx_nearset = np.argsort(dists[i,:])[:k]
+            print(idx_nearset)
+            closest_y = self.y_train[idx_nearset]
+            print(closest_y)
             pass
 
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
@@ -175,7 +179,9 @@ class KNearestNeighbor(object):
             # label.                                                                #
             #########################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-
+            
+            y_pred[i] = np.argmax(np.bincount(closest_y)) #出现了[4,2,2,4,7]确选了2的问题
+            print(y_pred[i])
             pass
 
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
