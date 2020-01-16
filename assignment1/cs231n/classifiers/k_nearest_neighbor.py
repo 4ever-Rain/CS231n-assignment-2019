@@ -101,6 +101,9 @@ class KNearestNeighbor(object):
             #######################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
+            #Learn np.Boradcast http://cs231n.github.io/python-numpy-tutorial/#numpy-math
+                        
+            dists[i,:] = np.sqrt(np.sum(np.square(self.X_train - X[i,:]), axis=1))
             pass
 
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
@@ -130,7 +133,8 @@ class KNearestNeighbor(object):
         #       and two broadcast sums.                                         #
         #########################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-
+        #Using (x-y)^2 = x^2 - 2xy + y^2 &  broadcast
+        dists = np.sqrt(np.sum(np.square(self.X_train), axis = 1) -2*np.dot(X, self.X_train.T) + + np.transpose([np.sum(np.square(X), axis = 1)]))
         pass
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
@@ -163,11 +167,11 @@ class KNearestNeighbor(object):
             # Hint: Look up the function numpy.argsort.                             #
             #########################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
-            print(np.argsort(dists[i,:]))
+            #print(np.argsort(dists[i,:]))
             idx_nearset = np.argsort(dists[i,:])[:k]
-            print(idx_nearset)
+            #print(idx_nearset)
             closest_y = self.y_train[idx_nearset]
-            print(closest_y)
+            #print(closest_y)
             pass
 
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
@@ -180,8 +184,8 @@ class KNearestNeighbor(object):
             #########################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
             
-            y_pred[i] = np.argmax(np.bincount(closest_y)) #出现了[4,2,2,4,7]确选了2的问题
-            print(y_pred[i])
+            y_pred[i] = np.argmax(np.bincount(closest_y)) #出现了[4,2,2,4,7]确选了2的问题，但是考虑到KNN的定义是做投票 所以理论上应该选几都行 不考虑距离
+            #print(y_pred[i])
             pass
 
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
