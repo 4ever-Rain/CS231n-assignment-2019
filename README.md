@@ -5,5 +5,5 @@ I'm learning CS231n now and I will finish the assignment of spring1819 (http://c
 
 The code will be updated asap.
 
-Any questions please email to rain2015@emails.edu.cn
+Any questions please email to rain2015@emails.bjut.edu.cn
 
