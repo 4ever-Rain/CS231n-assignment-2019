@@ -57,8 +57,12 @@ class LinearClassifier(object):
             #########################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-            pass
-
+            batch = np.random.choice(np.arange(num_train),size=batch_size,replace=True) #array of index
+            X_batch = X[batch,:]
+            y_batch = y[batch]
+            #print(X_batch.shape)
+            #print(y_batch.shape)
+            
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
             # evaluate loss and gradient
@@ -72,7 +76,8 @@ class LinearClassifier(object):
             #########################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-            pass
+            
+            self.W += - learning_rate * grad # perform parameter update
 
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
@@ -102,7 +107,7 @@ class LinearClassifier(object):
         ###########################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        y_pred = np.argmax(X.dot(self.W), axis=1)      
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         return y_pred
