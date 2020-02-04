@@ -33,7 +33,31 @@ def softmax_loss_naive(W, X, y, reg):
     #############################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    num_classes = W.shape[1]
+    num_train = X.shape[0]
+    
+    for i in range(num_train):
+        scores = X[i].dot(W)  #X[i].shape： （D，）; scores.shape: (C,)
+        scores -= np.max(scores)  #Numeric stabliity,use a normalization trick
+        softmax_function = np.exp(scores) / np.sum(np.exp(scores))
+        #print(softmax_function.shape)
+        loss -= np.log(softmax_function[y[i]])
+        for j in range(num_classes):
+          if j != y[i]:
+            dW[:,j] += softmax_function[j] * X[i]
+          else:
+            dW[:,j] += (softmax_function[j] -1) * X[i]
+                      
+    # Right now the loss is a sum over all training examples, but we want it
+    # to be an average instead so we divide by num_train.
+    #print(loss.shape)
+    loss /= num_train
+    dW /= num_train
+    # Add regularization to the loss.
+    loss += 0.5 * reg * np.sum(W * W)
+    dW += reg * W
+    # It can be computationally much more efficient to evaluate the gradient for 100 examples, than the gradient for one example 100 times.
+    # Add 0.5 before the loss reg so that the dw need not *2
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
@@ -58,7 +82,29 @@ def softmax_loss_vectorized(W, X, y, reg):
     #############################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    num_train = X.shape[0]
+
+    
+    ##############
+    scores = X.dot(W)  # shape: (D,C)
+    scores -= np.max(scores, axis=1, keepdims=True)  #Numeric stabliity,use a normalization trick
+    softmax_function = np.exp(scores) / np.sum(np.exp(scores), axis=1).reshape((-1,1))  #reshape the sum_scores as (N,1)
+    loss = np.sum(-np.log(softmax_function[np.arange(num_train),y]))
+
+    signal = np.zeros_like(scores)
+    signal = softmax_function
+    signal[np.arange(num_train),y] += -1
+
+    dW = X.T.dot(signal)
+
+    # Right now the loss is a sum over all training examples, but we want it
+    # to be an average instead so we divide by num_train.
+    #print(loss.shape)
+    loss /= num_train
+    dW /= num_train
+    # Add regularization to the loss.
+    loss += 0.5 * reg * np.sum(W * W)
+    dW += reg * W
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
