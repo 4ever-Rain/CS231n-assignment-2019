@@ -80,7 +80,8 @@ class TwoLayerNet(object):
         #############################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        scores = (X.dot(W1)+b1).clip(0).dot(W2)+b2
+        # Don;t forgot the ReLU
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
@@ -98,7 +99,17 @@ class TwoLayerNet(object):
         #############################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        # Softmax loss function and L2 regularization
+        scores -= np.max(scores, axis=1, keepdims=True)  #Numeric stabliity,use a normalization trick
+        softmax_function = np.exp(scores) / np.sum(np.exp(scores), axis=1).reshape((-1,1))  #reshape the sum_scores as (N,1)
+        loss = np.sum(-np.log(softmax_function[np.arange(N),y]))
+
+      
+        loss /= N
+        loss +=  reg * (np.sum(W1 * W1) + np.sum(W2 * W2))
+        # if *0.5 the loss will not same with the correct_loss,so delete it
+
+        
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
@@ -110,8 +121,32 @@ class TwoLayerNet(object):
         # grads['W1'] should store the gradient on W1, and be a matrix of same size #
         #############################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
+        
 
-        pass
+        # Don't forget the ReLU fuction!!!!!!!!!!!!!!!!
+        # f = (max((W1X + b1), 0) )* W2 + b2
+        signal = np.zeros_like(scores)
+        signal = softmax_function
+        signal[np.arange(N),y] += -1
+
+        # f = (w1x+b1)*w2 + b2
+        df = signal # shape:(N,C), df = dL/df
+        df /= N
+
+        # dab = da / db
+        # q = max((W1X + b1), 0) -----ReLU!!!!!
+        q = np.maximum(X.dot(W1) + b1, 0)  # shape:(N,H)
+        # add  rate in dl/dq for the max gradient
+        dqw1 = X
+        dfq = W2
+        dlq = df.dot(dfq.T)
+        dlq[q == 0] = 0 # shape(N,H) with the rate of Max gredient
+
+        grads['W1'] = (dqw1.T).dot(dlq) + 2 * reg * W1 # shape same with W1(D,H)=(D,N)*(N,C)*(C,H)
+        dfw2 = q  
+        grads['W2'] = dfw2.T.dot(df) + 2 * reg * W2 # shape same with W2(H,C)=(H,N)*(N,C)
+        grads['b1'] = np.sum(dlq, axis=0)  # shape same with b1(H,)
+        grads['b2'] = np.sum(df, axis=0)  # shape same with b2(C,)
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
@@ -156,7 +191,9 @@ class TwoLayerNet(object):
             #########################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-            pass
+            batch = np.random.choice(np.arange(num_train),size=batch_size,replace=True) #array of index
+            X_batch = X[batch,:]
+            y_batch = y[batch]
 
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
@@ -172,7 +209,10 @@ class TwoLayerNet(object):
             #########################################################################
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-            pass
+            self.params['W1'] += -grads['W1'] * learning_rate
+            self.params['W2'] += -grads['W2'] * learning_rate
+            self.params['b1'] += -grads['b1'] * learning_rate
+            self.params['b2'] += -grads['b2'] * learning_rate
 
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
@@ -218,7 +258,7 @@ class TwoLayerNet(object):
         ###########################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        y_pred = np.argmax((X.dot(self.params['W1'])+self.params['b1']).clip(0).dot(self.params['W2'])+self.params['b2'], axis=1)   
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
