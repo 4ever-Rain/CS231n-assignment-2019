@@ -196,7 +196,28 @@ class FullyConnectedNet(object):
         ############################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        
+        for i in range(1, self.num_layers + 1):
+            dim = []
+            if i == 1:
+                # input layers
+                dim.append(input_dim)
+                dim.append(hidden_dims[0])               
+            elif i == self.num_layers:
+                # output layers
+                dim.append(hidden_dims[i-1])
+                dim.append(num_classes)
+            else:
+                dim.append(hidden_dims[i-1])
+                dim.append(hidden_dims[i])
+
+            self.params['W' + str(i)] = np.random.normal(loc=0.0, scale=weight_scale, size=dim).astype(dtype)
+            self.params['b' + str(i)] = np.zeros(dim[0], dtype = dtype)
+
+            if i != self.num_layers - 1 and self.normalization != None:
+                self.params['gamma' + str(i)] = np.ones(dim[1], dtype=dtype)
+                self.params['beta' + str(i)] = np.zerps(dim[1], dtype=dtype)
+        
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         ############################################################################
@@ -259,7 +280,21 @@ class FullyConnectedNet(object):
         ############################################################################
         # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-        pass
+        for i in range(1, self.num_layers):
+            # Unpack variables from the params dictionary
+            W , b = self.params['W' + str(i)], sefl.param['b' + str(i)]
+            af, f_cache = affine_forward(X, W, b)
+
+            if self.normalization is not None:
+                pass
+
+            relu, r_cache = relu_forward(af)
+
+            
+
+        af1, f1_cache = affine_forward(X, W1, b1)
+        relu1, r1_cache = relu_forward(af1)
+        scores, f2_cache =affine_forward(relu1, W2, b2)
 
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         ############################################################################
