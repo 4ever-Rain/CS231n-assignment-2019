@@ -285,15 +285,16 @@ class FullyConnectedNet(object):
         f_cache = {}
         bn_cache = {}
         r_cache = {}
+        d_cache = {}
 
         scores = X
         for i in range(1, self.num_layers):
             # Unpack variables from the params dictionary
             num = str(i)
-            W , b = self.params['W' + num], self.params['b' + num]
-            scores, f_cache[i] = affine_forward(scores, W, b)
-
+            W, b = self.params['W' + num], self.params['b' + num]
             
+            scores, f_cache[i] = affine_forward(scores, W, b)
+           
             if self.normalization == 'batchnorm':
                 scores, bn_cache[i] = batchnorm_forward(scores, self.params['gamma' + num], self.params['beta' + num], bn_param[i-1])
             elif self.normalization == 'layernorm':
@@ -304,10 +305,11 @@ class FullyConnectedNet(object):
             scores, r_cache[i] = relu_forward(scores)
 
             if self.use_dropout is True:
-                scores, d_cache = dropout_forward(scores, self.dropout_param)
+                scores, d_cache[i] = dropout_forward(scores, self.dropout_param)
 
         # - affine - softmax
         W , b = self.params['W' + str(self.num_layers)], self.params['b' + str(self.num_layers)]
+        
         scores, af_cache = affine_forward(scores, W, b)
 
        
@@ -354,7 +356,7 @@ class FullyConnectedNet(object):
                 continue
 
             if self.use_dropout:
-                dout = dropout_backward(dout, d_cache)
+                dout = dropout_backward(dout, d_cache[i])
 
             dout = relu_backward(dout,  r_cache[i])
 
@@ -368,8 +370,7 @@ class FullyConnectedNet(object):
             # add reg items
             grads[W] += self.reg * self.params[W]
 
-            
-
+        
         # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         ############################################################################
         #                             END OF YOUR CODE                             #
